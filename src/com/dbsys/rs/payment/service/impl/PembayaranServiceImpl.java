@@ -21,6 +21,14 @@ public class PembayaranServiceImpl implements PembayaranService {
 	@Override
 	@Transactional(readOnly = false)
 	public Pembayaran simpan(Pembayaran pembayaran) {
+		
+		/*
+		 * Cicilan pasien otomatis ditambah sesuai jumlah pembayaran, 
+		 * karena Pasien cascade dengan Pembayaran (CascadeType.MERGE).
+		 * 
+		 * Jika cicilan sudah melebihi total tagihan, 
+		 * secara otomatis mengubah status pasien menjadi StatusPasien.LUNAS.
+		 */
 		return pembayaranRepository.save(pembayaran);
 	}
 
