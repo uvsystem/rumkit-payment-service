@@ -27,6 +27,10 @@ public class PembayaranServiceImpl implements PembayaranService {
 	@Override
 	@Transactional(readOnly = false)
 	public Pembayaran simpan(Pembayaran pembayaran) {
+		if (pembayaran.getKode() == null || pembayaran.getKode().equals("")) {
+			String kode = pembayaran.generateKode();
+			pembayaran.setKode(kode);
+		}
 		
 		/*
 		 * Update property pembayaran & statusTagihan pada tagihan,
@@ -38,13 +42,13 @@ public class PembayaranServiceImpl implements PembayaranService {
 		}
 		
 		pembayaran = pembayaranRepository.save(pembayaran);
-
+		
 		/*
 		 * Cicilan pasien otomatis ditambah sesuai jumlah pembayaran, 
 		 * karena Pasien cascade dengan Pembayaran (CascadeType.MERGE).
 		 */
-		pembayaran.getPasien().addCicilan(pembayaran.getJumlah());
-		Pasien pasien = pembayaran.getPasien();
+		Pasien pasien = pasienRepository.findOne(pembayaran.getPasien().getId());
+		pasien.addCicilan(pembayaran.getJumlah());
 		pasienRepository.updateCicilan(pasien.getId(), pasien.getCicilan());
 
 		return pembayaran;
