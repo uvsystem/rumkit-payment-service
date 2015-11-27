@@ -43,12 +43,9 @@ public class PembayaranServiceImpl implements PembayaranService {
 		
 		pembayaran = pembayaranRepository.save(pembayaran);
 		
-		/*
-		 * Cicilan pasien otomatis ditambah sesuai jumlah pembayaran, 
-		 * karena Pasien cascade dengan Pembayaran (CascadeType.MERGE).
-		 */
 		Pasien pasien = pasienRepository.findOne(pembayaran.getPasien().getId());
 		pasien.addCicilan(pembayaran.getJumlah());
+		pembayaran.setPasien(pasien);
 		pasienRepository.updateCicilan(pasien.getId(), pasien.getCicilan());
 
 		return pembayaran;
